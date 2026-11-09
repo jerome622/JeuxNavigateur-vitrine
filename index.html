@@ -28,6 +28,13 @@
   .jeu a:focus { outline:3px solid #fff; outline-offset:2px; }
   .jeu:focus-within { outline:3px solid var(--accent); transform:scale(1.03); transition:transform .12s; }
   @media (prefers-reduced-motion: reduce) { .jeu:focus-within { transform:none; } }
+  #ecranJeu { position:fixed; inset:0; background:#000; display:none; z-index:10; }
+  #ecranJeu.ouvert { display:block; }
+  body:has(#ecranJeu.ouvert) { overflow:hidden; }
+  #ecranJeu iframe { width:100%; height:100%; border:0; }
+  .boutonsJeu { position:absolute; top:8px; left:8px; display:flex; gap:8px; }
+  .boutonsJeu button, .boutonsJeu a { padding:8px 12px; border-radius:8px; border:0; background:rgba(16,19,24,.85); color:#fff; font:600 14px system-ui, sans-serif; text-decoration:none; cursor:pointer; }
+  .boutonsJeu button { background:var(--accent); color:#06140d; }
   #manette { display:none; color:var(--accent); font-size:13px; margin-top:4px; }
   footer { color:var(--doux); font-size:13px; padding:0 16px 32px; max-width:1200px; margin:auto; }
   footer a { color:var(--doux); }
@@ -37,7 +44,7 @@
 <header>
   <h1>Jeux dans le navigateur</h1>
   <div id="compte">Chargement de la liste…</div>
-  <div id="manette">🎮 Manette connectée : croix ou stick = se déplacer · A / Croix = jouer · LB / RB = changer de filtre</div>
+  <div id="manette">🎮 Manette connectée : croix ou stick = se déplacer · A / Croix = jouer · LB / RB = changer de filtre · Accueil (ou Select + Start) = revenir ici</div>
 </header>
 <div class="barre">
   <input id="cherche" type="search" placeholder="Chercher un jeu" aria-label="Chercher un jeu">
@@ -47,6 +54,13 @@
   <button data-f="multi">Multijoueur</button>
 </div>
 <main id="liste"></main>
+<div id="ecranJeu">
+  <iframe id="cadre" title="Jeu" allow="fullscreen; gamepad; autoplay; clipboard-write" allowfullscreen></iframe>
+  <div class="boutonsJeu">
+    <button id="accueil" title="Revenir à la liste (Échap, ou bouton Accueil / Select + Start de la manette)">🏠 Accueil</button>
+    <a id="aPart" target="_blank" rel="noopener noreferrer">↗ Ouvrir à part</a>
+  </div>
+</div>
 <footer>
   Liste tirée chaque fois en direct de la liste communautaire
   <a href="https://github.com/SubmitGame/awesome-decomp-games" target="_blank" rel="noopener">awesome-decomp-games</a>.
@@ -72,6 +86,7 @@ function tags(j) {
   if (j.needs_assets === 'demo') t.push('démo gratuite');
   if (j.needs_assets === 'byo') t.push('vos fichiers du jeu');
   if (j.multiplayer) t.push('multijoueur');
+  if (bloque(j.play_url)) t.push('s\'ouvre dans un autre onglet');
   return t.join(' · ');
 }
 
@@ -104,6 +119,39 @@ document.querySelectorAll('.barre button').forEach(b => b.onclick = () => {
   b.classList.add('actif');
   filtre = b.dataset.f;
   afficher();
+});
+
+// --- Jeu ouvert dans la page, avec le bouton Accueil par-dessus ---
+// shortcut: liste faite à la main le 09/11/2026 (sites qui refusent d'être affichés dans une autre page) ; un nouveau site qui refuse restera noir → bouton « Ouvrir à part »
+const BLOQUES = ['crashbash.app', 'wasmarcade.com', 'zombies.concentric.live', 'pieter.com', 'olivers.tools'];
+function bloque(u) {
+  try { const h = new URL(u).hostname; return BLOQUES.some(b => h === b || h.endsWith('.' + b)); }
+  catch { return true; }
+}
+const ecran = document.getElementById('ecranJeu'), cadre = document.getElementById('cadre');
+let dernierLien = null;
+function lancer(lien) {
+  if (bloque(lien.href)) return false;
+  dernierLien = lien;
+  cadre.src = lien.href.replace(/^http:/, 'https:');  // une page https ne peut pas afficher un site http
+  document.getElementById('aPart').href = lien.href;
+  ecran.classList.add('ouvert');
+  cadre.focus();
+  return true;
+}
+function accueil() {
+  if (!ecran.classList.contains('ouvert')) return;
+  if (document.fullscreenElement) document.exitFullscreen();
+  cadre.src = 'about:blank';  // coupe le son et le jeu
+  ecran.classList.remove('ouvert');
+  dernierLien?.focus();
+}
+document.getElementById('accueil').onclick = accueil;
+document.getElementById('aPart').addEventListener('click', accueil);
+addEventListener('keydown', e => { if (e.key === 'Escape') accueil(); });
+document.getElementById('liste').addEventListener('click', e => {
+  const lien = e.target.closest('.jeu a');
+  if (lien && lancer(lien)) e.preventDefault();  // sinon : ouverture normale dans un autre onglet
 });
 
 // --- Manette (toutes marques : le navigateur range Xbox, PlayStation, Switch… dans la même disposition) ---
@@ -140,16 +188,22 @@ function lireManette() {
       haut: appui(12) || m.axes[1] < -0.6, bas: appui(13) || m.axes[1] > 0.6,
       gauche: appui(14) || m.axes[0] < -0.6, droite: appui(15) || m.axes[0] > 0.6,
       a: appui(0), lb: appui(4), rb: appui(5),
+      maison: appui(16) || (appui(8) && appui(9)),  // bouton Accueil, ou Select + Start si Windows le garde pour lui
     };
     const nouveau = k => s[k] && !avant[k];  // une action par appui, pas en continu
+    if (ecran.classList.contains('ouvert')) {  // en jeu : la manette sert au jeu, sauf le retour
+      if (nouveau('maison')) accueil();
+      avant = s;
+      break;
+    }
     if (nouveau('haut')) bouger(0, -1);
     if (nouveau('bas')) bouger(0, 1);
     if (nouveau('gauche')) bouger(-1, 0);
     if (nouveau('droite')) bouger(1, 0);
     if (nouveau('lb')) changerFiltre(-1);
     if (nouveau('rb')) changerFiltre(1);
-    // même onglet : un appui manette n'autorise pas l'ouverture d'un nouvel onglet
-    if (nouveau('a') && document.activeElement.matches('.jeu a')) location.href = document.activeElement.href;
+    // site qui refuse d'être dans la page : même onglet, car un appui manette n'autorise pas d'ouvrir un nouvel onglet
+    if (nouveau('a') && document.activeElement.matches('.jeu a') && !lancer(document.activeElement)) location.href = document.activeElement.href;
     avant = s;
     break;
   }

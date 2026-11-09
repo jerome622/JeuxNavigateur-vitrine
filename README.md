@@ -21,9 +21,10 @@
 | ⚡ **Jeu immédiat** | Seulement les jeux qui se lancent tout de suite, sans fichier à fournir (et les démos gratuites). |
 | 💾 **Fichiers du jeu requis** | Les jeux qui demandent les fichiers de votre propre copie du jeu. |
 | 👥 **Multijoueur** | Seulement les jeux où l'on joue à plusieurs en ligne. |
-| ▶️ **Jouer** | Le bouton ouvre le jeu dans un nouvel onglet. |
+| ▶️ **Jouer** | Le jeu s'ouvre en grand **dans la page**. Une dizaine de sites refusent cela : ceux-là s'ouvrent dans un autre onglet (c'est écrit sur la carte du jeu). |
+| 🏠 **Accueil** | Pendant le jeu, un bouton **🏠 Accueil** en haut à gauche ramène à la liste, à l'endroit où vous étiez. Au clavier : **Échap** (si le jeu ne la garde pas pour lui). À la manette : bouton **Accueil** (Xbox / PS / Home) ou **Select + Start** ensemble. Le bouton **↗ Ouvrir à part** ouvre le jeu dans son propre onglet si l'écran reste noir. |
 | 🔄 **Toujours à jour** | À chaque ouverture, la page lit la dernière version de la liste. Pas de serveur, rien à mettre à jour à la main. |
-| 🎮 **Manette** | Toutes les manettes reconnues par le navigateur (Xbox, PlayStation, Switch Pro, manettes USB…). Croix ou stick pour choisir un jeu, **A** (ou **Croix** sur PlayStation) pour le lancer, **LB / RB** pour changer de filtre. Appuyez sur un bouton de la manette pour qu'elle soit détectée. |
+| 🎮 **Manette** | Toutes les manettes reconnues par le navigateur (Xbox, PlayStation, Switch Pro, manettes USB…). Croix ou stick pour choisir un jeu, **A** (ou **Croix** sur PlayStation) pour le lancer, **LB / RB** pour changer de filtre, **Accueil** ou **Select + Start** pour quitter un jeu. Appuyez sur un bouton de la manette pour qu'elle soit détectée. |
 | 📱 **Partout** | Ordinateur, tablette et téléphone. |
 | 🚫 **Sans publicité** | Pas de pub, pas de fenêtre qui s'ouvre toute seule, pas de compte. |
 
