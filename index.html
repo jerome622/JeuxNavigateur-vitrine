@@ -136,6 +136,7 @@ function lancer(lien) {
   cadre.src = lien.href.replace(/^http:/, 'https:');  // une page https ne peut pas afficher un site http
   document.getElementById('aPart').href = lien.href;
   ecran.classList.add('ouvert');
+  window.Android?.etatJeu(true);  // appli Android : la manette va au jeu
   cadre.focus();
   return true;
 }
@@ -144,11 +145,22 @@ function accueil() {
   if (document.fullscreenElement) document.exitFullscreen();
   cadre.src = 'about:blank';  // coupe le son et le jeu
   ecran.classList.remove('ouvert');
+  window.Android?.etatJeu(false);
   dernierLien?.focus();
 }
 document.getElementById('accueil').onclick = accueil;
 document.getElementById('aPart').addEventListener('click', accueil);
-addEventListener('keydown', e => { if (e.key === 'Escape') accueil(); });
+// clavier et télécommande des box TV : flèches = se déplacer, Entrée = jouer (natif sur un lien), Échap = accueil
+const FLECHES = { ArrowUp: [0, -1], ArrowDown: [0, 1], ArrowLeft: [-1, 0], ArrowRight: [1, 0] };
+addEventListener('keydown', e => {
+  if (e.key === 'Escape') return accueil();
+  if (!FLECHES[e.key] || ecran.classList.contains('ouvert')) return;
+  const dansRecherche = e.target.id === 'cherche';
+  if (dansRecherche && e.key !== 'ArrowDown') return;  // gauche / droite servent à écrire
+  e.preventDefault();
+  if (dansRecherche) return bouger(0, 0);
+  bouger(...FLECHES[e.key]);
+});
 document.getElementById('liste').addEventListener('click', e => {
   const lien = e.target.closest('.jeu a');
   if (lien && lancer(lien)) e.preventDefault();  // sinon : ouverture normale dans un autre onglet
@@ -210,6 +222,7 @@ function lireManette() {
   requestAnimationFrame(lireManette);
 }
 addEventListener('gamepadconnected', () => {
+  if (window.Android) return;  // l'appli Android traduit déjà la manette en touches : sinon chaque appui compterait deux fois
   document.getElementById('manette').style.display = 'block';
   if (!lectureLancee) { lectureLancee = true; lireManette(); }
   bouger(0, 0);
