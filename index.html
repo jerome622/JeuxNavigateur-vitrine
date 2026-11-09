@@ -153,7 +153,7 @@ document.getElementById('aPart').addEventListener('click', accueil);
 // clavier et télécommande des box TV : flèches = se déplacer, Entrée = jouer (natif sur un lien), Échap = accueil
 const FLECHES = { ArrowUp: [0, -1], ArrowDown: [0, 1], ArrowLeft: [-1, 0], ArrowRight: [1, 0] };
 addEventListener('keydown', e => {
-  if (e.key === 'Escape') return accueil();
+  if (e.key === 'Escape') return window.Android ? undefined : accueil();  // appli Android : B = Échap pour le jeu, le retour passe par Retour / Select + Start
   if (!FLECHES[e.key] || ecran.classList.contains('ouvert')) return;
   const dansRecherche = e.target.id === 'cherche';
   if (dansRecherche && e.key !== 'ArrowDown') return;  // gauche / droite servent à écrire
