@@ -23,6 +23,7 @@
 | 👥 **Multijoueur** | Seulement les jeux où l'on joue à plusieurs en ligne. |
 | ▶️ **Jouer** | Le bouton ouvre le jeu dans un nouvel onglet. |
 | 🔄 **Toujours à jour** | À chaque ouverture, la page lit la dernière version de la liste. Pas de serveur, rien à mettre à jour à la main. |
+| 🎮 **Manette** | Toutes les manettes reconnues par le navigateur (Xbox, PlayStation, Switch Pro, manettes USB…). Croix ou stick pour choisir un jeu, **A** (ou **Croix** sur PlayStation) pour le lancer, **LB / RB** pour changer de filtre. Appuyez sur un bouton de la manette pour qu'elle soit détectée. |
 | 📱 **Partout** | Ordinateur, tablette et téléphone. |
 | 🚫 **Sans publicité** | Pas de pub, pas de fenêtre qui s'ouvre toute seule, pas de compte. |
 
@@ -45,6 +46,7 @@ Cette page ne fournit et n'héberge aucun fichier de jeu.
 
 - Les jeux sont sur les **sites d'autres personnes**. Leur sécurité et leurs droits ne sont pas vérifiés ici.
 - **N'installez jamais** un logiciel, un « lanceur » ou une extension qu'un site de jeu vous demande d'installer.
+- La manette marche sur **cette page**. Dans le jeu lui-même, c'est le site du jeu qui décide : certains la gèrent, d'autres seulement le clavier et la souris.
 - Il faut une connexion Internet. Certains jeux sont lourds et mettent un moment à charger.
 
 ---

@@ -25,6 +25,10 @@
   .jeu b { font-size:15px; }
   .tags { color:var(--doux); font-size:13px; }
   .jeu a { margin-top:auto; text-align:center; padding:9px; border-radius:7px; background:var(--accent); color:#06140d; font-weight:600; text-decoration:none; }
+  .jeu a:focus { outline:3px solid #fff; outline-offset:2px; }
+  .jeu:focus-within { outline:3px solid var(--accent); transform:scale(1.03); transition:transform .12s; }
+  @media (prefers-reduced-motion: reduce) { .jeu:focus-within { transform:none; } }
+  #manette { display:none; color:var(--accent); font-size:13px; margin-top:4px; }
   footer { color:var(--doux); font-size:13px; padding:0 16px 32px; max-width:1200px; margin:auto; }
   footer a { color:var(--doux); }
 </style>
@@ -33,6 +37,7 @@
 <header>
   <h1>Jeux dans le navigateur</h1>
   <div id="compte">Chargement de la liste…</div>
+  <div id="manette">🎮 Manette connectée : croix ou stick = se déplacer · A / Croix = jouer · LB / RB = changer de filtre</div>
 </header>
 <div class="barre">
   <input id="cherche" type="search" placeholder="Chercher un jeu" aria-label="Chercher un jeu">
@@ -100,6 +105,62 @@ document.querySelectorAll('.barre button').forEach(b => b.onclick = () => {
   filtre = b.dataset.f;
   afficher();
 });
+
+// --- Manette (toutes marques : le navigateur range Xbox, PlayStation, Switch… dans la même disposition) ---
+function bouger(dx, dy) {
+  const liens = [...document.querySelectorAll('.jeu a')];
+  const ici = document.activeElement;
+  if (!liens.includes(ici)) return liens[0]?.focus();
+  const a = ici.getBoundingClientRect();
+  let meilleur = null, dMin = Infinity;
+  for (const l of liens) {
+    const b = l.getBoundingClientRect();
+    const vx = b.left - a.left, vy = b.top - a.top;
+    if ((dx && Math.sign(vx) !== dx) || (dy && Math.sign(vy) !== dy)) continue;  // pas dans la bonne direction
+    const d = dx ? Math.abs(vx) + Math.abs(vy) * 3 : Math.abs(vy) + Math.abs(vx) * 3;  // préfère rester sur la même ligne / colonne
+    if (d < dMin) { dMin = d; meilleur = l; }
+  }
+  meilleur?.focus();
+  meilleur?.scrollIntoView({ block: 'center', behavior: 'smooth' });
+}
+
+function changerFiltre(sens) {
+  const btn = [...document.querySelectorAll('.barre button')];
+  const i = btn.indexOf(document.querySelector('.barre .actif'));
+  btn[(i + sens + btn.length) % btn.length].click();
+  bouger(0, 0);
+}
+
+let avant = {}, lectureLancee = false;
+function lireManette() {
+  for (const m of navigator.getGamepads ? navigator.getGamepads() : []) {
+    if (!m) continue;
+    const appui = n => m.buttons[n]?.pressed;
+    const s = {
+      haut: appui(12) || m.axes[1] < -0.6, bas: appui(13) || m.axes[1] > 0.6,
+      gauche: appui(14) || m.axes[0] < -0.6, droite: appui(15) || m.axes[0] > 0.6,
+      a: appui(0), lb: appui(4), rb: appui(5),
+    };
+    const nouveau = k => s[k] && !avant[k];  // une action par appui, pas en continu
+    if (nouveau('haut')) bouger(0, -1);
+    if (nouveau('bas')) bouger(0, 1);
+    if (nouveau('gauche')) bouger(-1, 0);
+    if (nouveau('droite')) bouger(1, 0);
+    if (nouveau('lb')) changerFiltre(-1);
+    if (nouveau('rb')) changerFiltre(1);
+    // même onglet : un appui manette n'autorise pas l'ouverture d'un nouvel onglet
+    if (nouveau('a') && document.activeElement.matches('.jeu a')) location.href = document.activeElement.href;
+    avant = s;
+    break;
+  }
+  requestAnimationFrame(lireManette);
+}
+addEventListener('gamepadconnected', () => {
+  document.getElementById('manette').style.display = 'block';
+  if (!lectureLancee) { lectureLancee = true; lireManette(); }
+  bouger(0, 0);
+});
+addEventListener('gamepaddisconnected', () => document.getElementById('manette').style.display = 'none');
 
 fetch(DEPOT + 'data/games.json')
   .then(r => r.json())
