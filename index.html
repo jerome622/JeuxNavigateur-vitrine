@@ -1,0 +1,116 @@
+<!doctype html>
+<html lang="fr">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Jeux Navigateur</title>
+<style>
+  :root { --fond:#101318; --carte:#1a1f27; --texte:#e8ecf1; --doux:#8b95a3; --accent:#4cc38a; }
+  * { box-sizing:border-box; }
+  body { margin:0; background:var(--fond); color:var(--texte); font:15px/1.4 system-ui, sans-serif; }
+  header { padding:24px 16px 8px; max-width:1200px; margin:auto; }
+  h1 { margin:0 0 4px; font-size:26px; }
+  #compte { color:var(--doux); }
+  .barre { display:flex; flex-wrap:wrap; gap:8px; padding:12px 16px; max-width:1200px; margin:auto; }
+  input { flex:1 1 220px; padding:10px 12px; border-radius:8px; border:1px solid #2c3440; background:var(--carte); color:var(--texte); font-size:16px; }
+  .barre button { padding:10px 14px; border-radius:8px; border:1px solid #2c3440; background:var(--carte); color:var(--texte); cursor:pointer; }
+  .barre button.actif { background:var(--accent); color:#06140d; border-color:var(--accent); font-weight:600; }
+  main { padding:0 16px 32px; max-width:1200px; margin:auto; }
+  h2 { margin:24px 0 10px; font-size:19px; border-bottom:2px solid var(--accent); padding-bottom:6px; }
+  h2 small { color:var(--doux); font-weight:400; font-size:14px; }
+  .grille { display:grid; grid-template-columns:repeat(auto-fill, minmax(240px, 1fr)); gap:14px; }
+  .jeu { background:var(--carte); border-radius:10px; overflow:hidden; display:flex; flex-direction:column; }
+  .jeu img { width:100%; aspect-ratio:16/9; object-fit:cover; background:#000; }
+  .jeu div { padding:10px 12px; flex:1; display:flex; flex-direction:column; gap:6px; }
+  .jeu b { font-size:15px; }
+  .tags { color:var(--doux); font-size:13px; }
+  .jeu a { margin-top:auto; text-align:center; padding:9px; border-radius:7px; background:var(--accent); color:#06140d; font-weight:600; text-decoration:none; }
+  footer { color:var(--doux); font-size:13px; padding:0 16px 32px; max-width:1200px; margin:auto; }
+  footer a { color:var(--doux); }
+</style>
+</head>
+<body>
+<header>
+  <h1>Jeux dans le navigateur</h1>
+  <div id="compte">Chargement de la liste…</div>
+</header>
+<div class="barre">
+  <input id="cherche" type="search" placeholder="Chercher un jeu" aria-label="Chercher un jeu">
+  <button data-f="tous" class="actif">Tous</button>
+  <button data-f="direct">Jeu immédiat</button>
+  <button data-f="fichiers">Fichiers du jeu requis</button>
+  <button data-f="multi">Multijoueur</button>
+</div>
+<main id="liste"></main>
+<footer>
+  Liste tirée chaque fois en direct de la liste communautaire
+  <a href="https://github.com/SubmitGame/awesome-decomp-games" target="_blank" rel="noopener">awesome-decomp-games</a>.
+  Les jeux sont sur des sites d'autres personnes : leur sécurité et leurs droits ne sont pas vérifiés ici.
+  N'installez jamais un logiciel ou une extension qu'un site de jeu vous demande.
+</footer>
+<script>
+const DEPOT = 'https://raw.githubusercontent.com/SubmitGame/awesome-decomp-games/main/';
+const FILTRES = {
+  tous: () => true,
+  direct: j => j.needs_assets === 'instant' || j.needs_assets === 'demo',
+  fichiers: j => j.needs_assets === 'byo',
+  multi: j => j.multiplayer === true,
+};
+let jeux = [], filtre = 'tous';
+
+const echap = s => String(s ?? '').replace(/[&<>"']/g, c => '&#' + c.charCodeAt(0) + ';');
+const lienSur = u => /^https?:\/\//.test(u) ? u : '#';  // les liens viennent d'une liste publique : on refuse tout sauf http(s)
+
+function tags(j) {
+  const t = [j.platform];
+  if (j.needs_assets === 'instant') t.push('jeu immédiat');
+  if (j.needs_assets === 'demo') t.push('démo gratuite');
+  if (j.needs_assets === 'byo') t.push('vos fichiers du jeu');
+  if (j.multiplayer) t.push('multijoueur');
+  return t.join(' · ');
+}
+
+function afficher() {
+  const mot = document.getElementById('cherche').value.trim().toLowerCase();
+  const vus = jeux.filter(FILTRES[filtre]).filter(j => j.title.toLowerCase().includes(mot));
+  const parPlateforme = {};  // pas Object.groupBy : absent des vieux iPad
+  vus.forEach(j => (parPlateforme[j.platform || 'Autre'] ||= []).push(j));
+  const ordre = Object.keys(parPlateforme).sort((a, b) => parPlateforme[b].length - parPlateforme[a].length);
+  document.getElementById('liste').innerHTML = vus.length ? ordre.map(p => `
+    <h2>${echap(p)} <small>${parPlateforme[p].length} jeu${parPlateforme[p].length > 1 ? 'x' : ''}</small></h2>
+    <div class="grille">${parPlateforme[p].map(carte).join('')}</div>`).join('') : '<p>Aucun jeu ne correspond.</p>';
+}
+
+function carte(j) {
+  return `
+    <article class="jeu">
+      <img loading="lazy" alt="" src="${j.screenshot ? DEPOT + echap(j.screenshot) : ''}">
+      <div>
+        <b>${echap(j.title)}</b>
+        <span class="tags">${echap(tags(j))}</span>
+        <a href="${echap(lienSur(j.play_url))}" target="_blank" rel="noopener noreferrer">▶ Jouer</a>
+      </div>
+    </article>`;
+}
+
+document.getElementById('cherche').oninput = afficher;
+document.querySelectorAll('.barre button').forEach(b => b.onclick = () => {
+  document.querySelector('.barre .actif').classList.remove('actif');
+  b.classList.add('actif');
+  filtre = b.dataset.f;
+  afficher();
+});
+
+fetch(DEPOT + 'data/games.json')
+  .then(r => r.json())
+  .then(d => {
+    jeux = d.games
+      .filter(j => j.browser_playable && j.link_ok && j.play_status === 'ok' && !j.inactive)
+      .sort((a, b) => a.title.localeCompare(b.title));
+    document.getElementById('compte').textContent = jeux.length + ' jeux · liste du ' + new Date(d.generated_at).toLocaleDateString('fr-FR');
+    afficher();
+  })
+  .catch(() => document.getElementById('compte').textContent = 'Impossible de charger la liste (pas d\'Internet ?).');
+</script>
+</body>
+</html>
