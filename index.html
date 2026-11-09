@@ -221,8 +221,8 @@ function lireManette() {
   }
   requestAnimationFrame(lireManette);
 }
-addEventListener('gamepadconnected', () => {
-  if (window.Android) return;  // l'appli Android traduit déjà la manette en touches : sinon chaque appui compterait deux fois
+addEventListener('gamepadconnected', e => {
+  if (window.Android) return console.log('MANETTE-VUE ' + e.gamepad.id);  // contrôle : le moteur web de l'appli voit-il la manette ?  // l'appli Android traduit déjà la manette en touches : sinon chaque appui compterait deux fois
   document.getElementById('manette').style.display = 'block';
   if (!lectureLancee) { lectureLancee = true; lireManette(); }
   bouger(0, 0);
