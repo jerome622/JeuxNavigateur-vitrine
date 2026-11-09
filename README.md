@@ -12,6 +12,22 @@
 
 ---
 
+## 📥 Installer
+
+| Appareil | Quoi faire |
+|---|---|
+| 💻 **PC Windows** | Télécharger **[JeuxNavigateur.exe](https://github.com/jerome622/JeuxNavigateur-vitrine/releases/latest/download/JeuxNavigateur.exe)** et l'ouvrir. La page s'ouvre dans sa propre fenêtre, sans barre d'adresse (avec Edge ou Chrome). **F11** = plein écran. Windows peut afficher « Windows a protégé votre ordinateur » : cliquer sur **Informations complémentaires** puis **Exécuter quand même** (l'appli n'est pas signée, c'est normal pour un petit projet). |
+| 📱 **Téléphone / tablette Android** | Télécharger **[JeuxNavigateur.apk](https://github.com/jerome622/JeuxNavigateur-vitrine/releases/latest/download/JeuxNavigateur.apk)** sur l'appareil et l'ouvrir. Android demande d'autoriser l'installation depuis le navigateur : accepter. |
+| 📺 **Box TV Android** (Freebox Pop / Ultra, Bbox 4K, SFR Box 8 TV, Nvidia Shield, Mi Box, Chromecast Google TV, TV Android…) | Installer l'appli **Downloader** depuis le Play Store, taper l'adresse de l'APK ci-dessus, puis installer. L'appli apparaît dans la liste des applis de la box. |
+| 🍎 **iPhone / iPad / Mac / autres** | Pas d'appli à installer : ouvrir simplement **[la page](https://jerome622.github.io/JeuxNavigateur-vitrine/)** dans Safari ou un autre navigateur. Sur iPhone / iPad : bouton Partager → **Sur l'écran d'accueil** pour avoir une icône. |
+
+L'appli et le .exe affichent la page en ligne : ils sont **toujours à jour**, rien à réinstaller quand la liste des jeux change.
+
+**Sur box TV :** flèches de la télécommande pour choisir, **OK** pour jouer, **Retour** pour revenir à la liste.
+Les box qui ne sont pas sous Android (par exemple le décodeur TV classique de la Livebox) ne peuvent pas installer d'appli.
+
+---
+
 ## ✨ Ce que fait la page
 
 | | |
@@ -25,7 +41,8 @@
 | 🏠 **Accueil** | Pendant le jeu, un bouton **🏠 Accueil** en haut à gauche ramène à la liste, à l'endroit où vous étiez. Au clavier : **Échap** (si le jeu ne la garde pas pour lui). À la manette : bouton **Accueil** (Xbox / PS / Home) ou **Select + Start** ensemble. Le bouton **↗ Ouvrir à part** ouvre le jeu dans son propre onglet si l'écran reste noir. |
 | 🔄 **Toujours à jour** | À chaque ouverture, la page lit la dernière version de la liste. Pas de serveur, rien à mettre à jour à la main. |
 | 🎮 **Manette** | Toutes les manettes reconnues par le navigateur (Xbox, PlayStation, Switch Pro, manettes USB…). Croix ou stick pour choisir un jeu, **A** (ou **Croix** sur PlayStation) pour le lancer, **LB / RB** pour changer de filtre, **Accueil** ou **Select + Start** pour quitter un jeu. Appuyez sur un bouton de la manette pour qu'elle soit détectée. |
-| 📱 **Partout** | Ordinateur, tablette et téléphone. |
+| ⌨️ **Clavier / télécommande** | Flèches pour choisir un jeu, **Entrée** (ou **OK**) pour jouer, **Échap** (ou **Retour**) pour revenir. |
+| 📱 **Partout** | Ordinateur, tablette, téléphone et box TV. |
 | 🚫 **Sans publicité** | Pas de pub, pas de fenêtre qui s'ouvre toute seule, pas de compte. |
 
 ---
